@@ -100,22 +100,24 @@ def get_recommendations(
     query_string = list_of_strings[index_of_source_string]
     match_count = 0
     
-    columns=["type", "criteria", "distance", "string"] 
+    columns=["match", "distance", "string"] 
     df = pd.DataFrame(columns=columns)
+    
+    source = None
     
     for i in indices_of_nearest_neighbors:
         if query_string == list_of_strings[i]:
-            # add to df with type of "query"
-            data = [["query", criteria_for_embeddings[i]["criteria"], distances[i], list_of_strings[i]]]
-            query = pd.DataFrame(data, columns=columns)
-            df = pd.concat([df, query])
+            source = criteria_for_embeddings[i]["criteria"] # update source 
             continue
         if match_count >= k_nearest_neighbors:
             break
         match_count += 1
-        data = [["match", criteria_for_embeddings[i]["criteria"], distances[i], list_of_strings[i]]]
+        data = [[criteria_for_embeddings[i]["criteria"], distances[i], list_of_strings[i]]]
         matches = pd.DataFrame(data, columns=columns)
         df = pd.concat([df, matches])
+    
+    # add "source" col after "match" col
+    df.insert(1, "source", source)
     
     return df
 
