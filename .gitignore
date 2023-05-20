@@ -1,0 +1,59 @@
+archive/
+venv/
+course/
+
+# dependencies
+/node_modules
+
+# testing
+/coverage
+
+# remove web_app_crawler_testing directory
+/testing 
+
+/external_server_tests
+external_server_tests
+
+# remove node_modules directory
+node_modules
+frontend/node_modules/*
+frontend/node_modules 
+/node_modules
+/*/node_modules
+/*/*/node_modules
+
+archive/
+
+# production
+/build
+logs/
+frontend_nextjs/
+frontend-old/
+/nohup.out
+/npmout
+*__pycache__
+/*/__pycache__
+/*/*/__pycache__
+/*/*/*/__pycache__
+/*/*/*/*/__pycache__
+/*/*/*/*/*/__pycache__
+/*/*/*/*/*/*/__pycache__
+
+# misc
+.DS_Store
+
+# env
+.env
+.env.development.local
+.env.test.local
+.env.production.local
+
+# log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# firebase
+
+.firebase
+.firebaserc
