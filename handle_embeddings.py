@@ -11,7 +11,7 @@ from sklearn.neighbors import NearestNeighbors
 config = dotenv_values(".env")
 openai.api_key = config["OPENAI_API_KEY"]
 
-# GET EMBEDDINGS
+### *** GET EMBEDDINGS *** ###
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 def get_embedding(text, model="text-embedding-ada-002"):
@@ -59,7 +59,7 @@ def create_embeddings(list_of_strings, embedding_cache_path, model="text-embeddi
     else:
         raise ValueError("No embeddings were created.")
 
-# BUILD VISUALIZATIONS
+### *** BUILD VISUALIZATIONS *** ###
 
 def visualize_embeddings(embeddings, criteria):
     project = atlas.map_embeddings(
@@ -69,7 +69,7 @@ def visualize_embeddings(embeddings, criteria):
     return project
 
 
-# RECOMMENDATION SYSTEM
+### *** RECOMMENDATION SYSTEM *** ###
 
 def get_distances(query_embedding, embeddings):
     distances = pairwise_distances([query_embedding], embeddings, metric="cosine")[0]

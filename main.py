@@ -2,8 +2,11 @@ import openai
 from helpers.count_tokens_and_cost import count_tokens_and_cost
 from dotenv import dotenv_values
 import pandas as pd 
-# from handle_embeddings_v2 import create_embeddings
-from handle_embeddings import create_embeddings, visualize_embeddings, get_recommendations
+from handle_embeddings import (
+    create_embeddings, 
+    visualize_embeddings, 
+    get_recommendations
+)
 
 config = dotenv_values(".env")
 
@@ -70,9 +73,7 @@ def run_openai(
                 index_of_source_string=i,
                 criteria_for_embeddings=criteria_for_embeddings
             )
-            # for i in range(len(message_list))
-            # run for first 50 messages
-            for i in range(50)
+            for i in range(len(message_list))
         ]
         
         recommendations = pd.concat(list_of_recommendation_dfs)
