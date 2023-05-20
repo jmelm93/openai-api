@@ -1,3 +1,6 @@
+## Check API Usage
+- https://platform.openai.com/account/usage
+
 ## All Open AI Models
 - Found Here: https://platform.openai.com/account/rate-limits
 

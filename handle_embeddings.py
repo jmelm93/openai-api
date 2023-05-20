@@ -4,9 +4,14 @@ from dotenv import dotenv_values
 from nomic import atlas
 from tenacity import retry, wait_random_exponential, stop_after_attempt
 import numpy as np
+import pandas as pd
+from sklearn.metrics.pairwise import pairwise_distances
+from sklearn.neighbors import NearestNeighbors
 
 config = dotenv_values(".env")
 openai.api_key = config["OPENAI_API_KEY"]
+
+# GET EMBEDDINGS
 
 @retry(wait=wait_random_exponential(min=1, max=20), stop=stop_after_attempt(6))
 def get_embedding(text, model="text-embedding-ada-002"):
@@ -54,6 +59,7 @@ def create_embeddings(list_of_strings, embedding_cache_path, model="text-embeddi
     else:
         raise ValueError("No embeddings were created.")
 
+# BUILD VISUALIZATIONS
 
 def visualize_embeddings(embeddings, criteria):
     project = atlas.map_embeddings(
@@ -61,6 +67,57 @@ def visualize_embeddings(embeddings, criteria):
         data=criteria
     )
     return project
+
+
+# RECOMMENDATION SYSTEM
+
+def get_distances(query_embedding, embeddings):
+    distances = pairwise_distances([query_embedding], embeddings, metric="cosine")[0]
+    return distances
+
+
+def get_nearest_neighbors(distances, k):
+    indices = distances.argsort()[:k]
+    return indices
+
+
+def get_recommendations(
+    list_of_strings,
+    criteria_for_embeddings,
+    embedding_cache_path,
+    index_of_source_string,
+    k_nearest_neighbors=5,
+):
+    # Get all of the embeddings
+    embeddings = [embedding_from_string(str_item, embedding_cache_path) for str_item in list_of_strings]
+    # Get embedding for our specific query string
+    query_embedding = embeddings[index_of_source_string]
+    # Get distances between our embedding and all other embeddings
+    distances = get_distances(query_embedding, embeddings)
+    # Get indices of the nearest neighbors
+    indices_of_nearest_neighbors = get_nearest_neighbors(distances, k_nearest_neighbors)
+    
+    query_string = list_of_strings[index_of_source_string]
+    match_count = 0
+    
+    columns=["type", "criteria", "distance", "string"] 
+    df = pd.DataFrame(columns=columns)
+    
+    for i in indices_of_nearest_neighbors:
+        if query_string == list_of_strings[i]:
+            # add to df with type of "query"
+            data = [["query", criteria_for_embeddings[i]["criteria"], distances[i], list_of_strings[i]]]
+            query = pd.DataFrame(data, columns=columns)
+            df = pd.concat([df, query])
+            continue
+        if match_count >= k_nearest_neighbors:
+            break
+        match_count += 1
+        data = [["match", criteria_for_embeddings[i]["criteria"], distances[i], list_of_strings[i]]]
+        matches = pd.DataFrame(data, columns=columns)
+        df = pd.concat([df, matches])
+    
+    return df
 
 if __name__ == "__main__":
     # Test embedding creation
