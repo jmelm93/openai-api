@@ -4,3 +4,4 @@ tiktoken==0.4.0
 numpy==1.24.3
 tenacity==8.2.2
 pandas==2.0.1
+nomic==1.1.6

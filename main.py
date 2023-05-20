@@ -2,38 +2,40 @@ import openai
 from helpers.count_tokens_and_cost import count_tokens_and_cost
 from dotenv import dotenv_values
 import pandas as pd 
-from create_embeddings import create_embeddings
+# from handle_embeddings_v2 import create_embeddings
+from handle_embeddings import create_embeddings, visualize_embeddings
 
 config = dotenv_values(".env")
+
+# HARD CODED VALUES
+MAX_COST = 0.5
+MODEL = "text-embedding-ada-002"
+CSV_FILE_NAME = config["CONTENT_CSV_PATH"]
+EMBEDDING_PATH = f"embedding_cache/{CSV_FILE_NAME}.pkl"
+# EMBEDDING_PATH = f"embedding_cache/CSV_FILE_NAME{CSV_FILE_NAME}.json"
+CONTENT_COL_NAME = "content"
+CONTEXT_COL_NAME = "criteria"
+
+# get message list
+csv = pd.read_csv(f"./data/{CSV_FILE_NAME}.csv")
+
+# MESSAGES = csv.to_dict("records")
+# MESSAGES = MESSAGES[:3]
+
+MESSAGES = csv[CONTENT_COL_NAME].values.tolist()
+CRITERIA = csv[[CONTEXT_COL_NAME]].to_dict("records")
 
 # configure openai
 openai.api_key = config["OPENAI_API_KEY"]
 
-MAX_COST = 0.5
-MODEL = "text-embedding-ada-002"
-EMBEDDING_PATH = "embeddings.pkl"
 
-content_df = pd.read_csv('rrs-blog-content.csv')
-
-# MESSAGES = list of values from content_df['content']
-# MESSAGES = content_df['Content'].values.tolist()
-
-
-# messages = [
-#     {"role": "user", "content": f"write a hello world python function for me"}
-# ]
-
-# # list of content from messages
-# message_content = [message["content"] for message in messages] 
-
-MESSAGES = [
-    "I am a highly intelligent question answering bot. If you ask me a question that is rooted in truth, I will give you the answer. If you ask me a question that is nonsense, trickery, or has no clear answer, I will respond with \"Unknown\".",
-    "What is human life expectancy in the United States?",
-    "Who was president of the United States in 1955?"
-]
-
-
-def run_openai(message_list, model="gpt-3.5-turbo", max_cost=None, embedding_cache_path=None):
+def run_openai(
+    message_list, 
+    model="gpt-3.5-turbo", 
+    max_cost=None, 
+    embedding_cache_path=None,
+    criteria_for_embedding_visualization=None
+):
 
     # get tokens and cost 
     tokens_and_cost = count_tokens_and_cost(
@@ -47,19 +49,20 @@ def run_openai(message_list, model="gpt-3.5-turbo", max_cost=None, embedding_cac
         raise ValueError(f"Cost of {tokens_and_cost['cost']} exceeds max cost of {max_cost}")
 
     if model == "gpt-3.5-turbo":
-        # res = openai.ChatCompletion.create(
-        #     messages=messages,
-        #     model=model
-        # )
-        
+        # res = openai.ChatCompletion.create( messages=messages, model=model )
         # print(res)
-        # print(res["choices"][0]["message"]["content"])
         pass 
     
     elif model == "text-embedding-ada-002":
-        create_embeddings(message_list, embedding_cache_path)
-
-# tokens_and_cost = count_tokens_and_cost(
+        embeddings = create_embeddings(message_list, embedding_cache_path)
+        visual_context = visualize_embeddings(embeddings, criteria_for_embedding_visualization)
+        print('visual context', visual_context)
 
 if __name__ == "__main__":
-    run_openai(MESSAGES, MODEL, MAX_COST)
+    run_openai(
+        message_list=MESSAGES, 
+        model=MODEL, 
+        max_cost=MAX_COST,
+        embedding_cache_path=EMBEDDING_PATH,
+        criteria_for_embedding_visualization=CRITERIA
+    )

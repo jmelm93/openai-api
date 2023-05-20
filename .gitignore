@@ -2,6 +2,7 @@ archive/
 venv/
 course/
 data/
+embedding_cache/
 
 # dependencies
 /node_modules
