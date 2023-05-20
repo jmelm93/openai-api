@@ -1,6 +1,7 @@
 archive/
 venv/
 course/
+data/
 
 # dependencies
 /node_modules
