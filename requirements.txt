@@ -5,3 +5,5 @@ numpy==1.24.3
 tenacity==8.2.2
 pandas==2.0.1
 nomic==1.1.6
+psycopg2==2.9.6
+sentence-transformers==2.2.2

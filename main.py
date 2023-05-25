@@ -73,7 +73,9 @@ def run_openai(
                 index_of_source_string=i,
                 criteria_for_embeddings=criteria_for_embeddings
             )
-            for i in range(len(message_list))
+            # for i in range(len(message_list))
+            # run for index 3 to 10 pages
+            for i in range(3, 10)
         ]
         
         recommendations = pd.concat(list_of_recommendation_dfs)
