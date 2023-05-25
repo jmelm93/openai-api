@@ -1,4 +1,4 @@
-from sentence_transformers import SentenceTransformer
+from sentence_transformers import SentenceTransformer # https://pypi.org/project/sentence-transformers/
 from sklearn.metrics.pairwise import cosine_similarity
 import pandas as pd
 from dotenv import dotenv_values
@@ -8,9 +8,13 @@ import pickle
 
 config = dotenv_values(".env")
 
+# Config
+MODEL = 'all-mpnet-base-v2' # https://www.sbert.net/docs/pretrained_models.html
 QUERY_URL = '/example-1'
 CSV_FILE_NAME = config["CONTENT_CSV_PATH"]
 STORAGE_TYPE = 'pickle' # 'pickle' or 'postgres'
+
+# PostgreSQL credentials
 HOST = "localhost"
 DATABASE = "postgres"
 USER = "postgres"
@@ -18,12 +22,8 @@ PASSWORD = "postgres"
 
 # list of objects with keys "url", "text", "exclude", "weight"
 data = pd.read_csv(f"./data/{CSV_FILE_NAME}.csv")
-
-# add 'index' column to data
 data['index'] = data.index
-
-# turn data into a list of object
-data = data.to_dict("records")
+list_of_objects = data.to_dict("records")
 
 # Create a connection to the PostgreSQL database
 conn = psycopg2.connect(
@@ -47,7 +47,7 @@ c.execute('''
 ''')
 
 # Create the BERT model
-model = SentenceTransformer('all-MiniLM-L6-v2')
+model = SentenceTransformer(MODEL)
 
 
 def create_embedding_and_store_if_needed(obj, storage_type):
@@ -131,5 +131,5 @@ def get_related_pages(query_url, n, list_of_objects, storage_type):
 
 
 if __name__ == '__main__':
-    related_pages = get_related_pages(QUERY_URL, 2, data, STORAGE_TYPE)
+    related_pages = get_related_pages(QUERY_URL, 2, list_of_objects, STORAGE_TYPE)
     print(related_pages)
