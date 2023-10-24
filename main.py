@@ -75,7 +75,7 @@ def run_openai(
             )
             # for i in range(len(message_list))
             # run for index 3 to 10 pages
-            for i in range(3, 10)
+            for i in range(200, 210)
         ]
         
         recommendations = pd.concat(list_of_recommendation_dfs)

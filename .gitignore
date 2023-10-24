@@ -1,8 +1,7 @@
 archive/
 venv/
-course/
-data/
-embedding_cache/
+*.pkl
+*.csv
 
 # dependencies
 /node_modules
